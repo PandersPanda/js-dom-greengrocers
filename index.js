@@ -68,13 +68,18 @@ let body = document.querySelector('body')
 let cartListHTML = document.getElementsByClassName('item-list cart--item-list')[0]
 let addToCartButtons = document.getElementsByClassName('addCartBtn')
 let totalSpan = document.getElementsByClassName('total-number')[0]
+let filters = document.getElementsByClassName('filterOption')
+let filterChosen = 'All'
 
 function addEventListeners(){
   let idCounter = 0
-  for(i of addToCartButtons){
+  for(i of addToCartButtons) {
     i.addEventListener('click', addItemToCart)
     i.setAttribute('id', state.items[idCounter].id)
     idCounter++
+  }
+  for(i of filters) {
+    i.addEventListener('click', filterItem)
   }
 }
 
@@ -82,14 +87,16 @@ function addDataToCart(){
   cartListHTML.innerHTML = ''
   if(state.cart.length !== 0) {
     for(product of state.cart){
-      let newProduct = document.createElement('li')
-      newProduct.innerHTML = `
+      if(filterChosen === 'All' || filterChosen === product.name){
+        let newProduct = document.createElement('li')
+        newProduct.innerHTML = `
         <img class="cart--item-icon" src="assets/icons/${product.id}.svg" alt="${product.name}"/>
         <p>${product.name}</p>
         <button class="quantity-btn remove-btn center" id=${product.name}-remove onClick='decreaseItem(event)'>-</button>
         <span class="quantity-text center">${product.quantity}</span>
         <button class="quantity-btn add-btn center" id=${product.name}-add onClick='increaseItem(event)'>+</button>`
-      cartListHTML.appendChild(newProduct)
+        cartListHTML.appendChild(newProduct)
+      }
     };
   }
   setTotalCost()
@@ -135,6 +142,11 @@ function setTotalCost(){
     sum += (product.price * product.quantity)
   }
   totalSpan.textContent = sum.toFixed(2).toString()
+}
+
+function filterItem(event){
+  filterChosen = event.target.textContent
+  addDataToCart()
 }
 
 addEventListeners()
